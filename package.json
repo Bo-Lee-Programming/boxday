@@ -1,0 +1,28 @@
+{
+  "name": "boxday",
+  "version": "0.1.0",
+  "description": "An AI member desk for small CSA farms: reads member messages, applies the farm's own policy, and settles add-ons, skips, credits and late joins through PayPal. Live packing sheet in AG Grid.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "keywords": [
+    "paypal",
+    "agentic-commerce",
+    "csa",
+    "farm",
+    "ag-grid",
+    "ollama"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@paypal/agent-toolkit": "^1.11.0",
+    "ag-grid-community": "^36.3.0",
+    "ajv": "^8.20.0"
+  }
+}

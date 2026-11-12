@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boxday: the member desk for small CSA farms</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/tonight.css">
+  <script src="/vendor/ag-grid-community.min.js"></script>
+</head>
+<body class="t">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect x="4" y="12" width="24" height="15" rx="3" fill="#3f6b2a"/><path d="M4 15h24" stroke="#2e5120" stroke-width="2"/><path d="M11 12c0-4 2-7 5-7" stroke="#3f6b2a" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M16 5c2.5 0 4.5 1.4 5 4-2.6.3-4.4-.9-5-4z" fill="#7aa95c"/><circle cx="11" cy="20" r="2.2" fill="#e9b949"/><circle cx="17" cy="20.5" r="2.2" fill="#d9603b"/><circle cx="22.5" cy="19.5" r="2" fill="#f2e3c6"/></svg>
+      <div>
+        <h1>Boxday <span class="farm" id="farm-name"></span></h1>
+        <p id="week-line">The member desk for small farm-share (CSA) farms</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="tonight" class="on">Tonight</button>
+      <button data-tab="sheet">Packing sheet</button>
+      <button data-tab="ledger">PayPal ledger</button>
+      <button data-tab="rules">Farm rules</button>
+    </nav>
+    <div class="badges">
+      <span id="badge-paypal" class="badge">PayPal: …</span>
+      <span id="badge-llm" class="badge">AI: …</span>
+      <button id="btn-wallet" class="btn small hidden">Connect sandbox buyer</button>
+      <a class="btn small ghost" href="/classic.html" title="The original all-panels view">Classic view</a>
+      <button id="btn-reset" class="btn small ghost" title="Restore the demo evening">Reset demo</button>
+    </div>
+  </header>
+
+  <!-- ============================================================ TONIGHT -->
+  <main class="pane" id="pane-tonight">
+    <div class="tonight">
+      <div class="col-main">
+        <section class="hero" id="hero"></section>
+        <section id="needs" class="needs hidden">
+          <h2 class="sec">Waiting for you <span id="needs-count" class="count"></span></h2>
+          <div id="needs-cards" class="cards"></div>
+        </section>
+        <section id="owed" class="owed hidden">
+          <div class="sec-head"><h2 class="sec">Payments still owed <span class="muted" id="owed-sum"></span></h2><button id="btn-chase" class="btn primary">Chase payments</button></div>
+          <p class="hint" id="owed-hint"></p>
+          <ul id="owed-list" class="feed"></ul>
+        </section>
+        <section>
+          <h2 class="sec" id="feed-title">Tonight's messages</h2>
+          <ul id="feed" class="feed"></ul>
+        </section>
+      </div>
+      <aside class="col-side">
+        <div class="phone-label" id="phone-label">What the member sees</div>
+        <div class="phone">
+          <div class="phone-top"><span class="dot"></span><div><b>Little Bluestem Farm</b><small>Ruth · via Boxday</small></div></div>
+          <div class="phone-body" id="phone-body"></div>
+        </div>
+        <p class="phone-note" id="phone-note"></p>
+        <details class="why" id="why"><summary>How Boxday decided</summary><div id="why-body"></div></details>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ============================================================ PACKING SHEET -->
+  <main class="pane hidden" id="pane-sheet">
+    <section class="card" id="card-sheet">
+      <div class="card-head">
+        <h2>Packing sheet <small class="muted" id="sheet-week"></small></h2>
+        <div class="row tight">
+          <input id="sheet-filter" type="search" placeholder="Filter members…">
+          <button id="btn-csv" class="btn small">Export packing list (CSV)</button>
+        </div>
+      </div>
+      <div id="site-summary" class="site-summary"></div>
+      <div id="sheet-grid" class="grid tall"></div>
+      <p class="muted small-note">Everything the agent changed tonight is already on the sheet; cells it changes flash. Double-click a cell to edit it yourself.</p>
+    </section>
+  </main>
+
+  <!-- ============================================================ LEDGER -->
+  <main class="pane hidden" id="pane-ledger">
+    <section class="card" id="card-statement">
+      <div class="card-head">
+        <h2>Statement <small class="muted">for you and your bookkeeper, straight from the PayPal ledger</small></h2>
+        <div class="row tight">
+          <div class="seg" id="st-period"><button data-p="week" class="on">This week</button><button data-p="season">Season to date</button></div>
+          <button id="btn-st-csv" class="btn small">Export statement (CSV)</button>
+        </div>
+      </div>
+      <div id="st-kpis" class="tiles"></div>
+      <div class="st-grid">
+        <div><h4 class="sub">By category</h4><table class="st-table" id="st-cats"></table></div>
+        <div><h4 class="sub">By member</h4><div id="st-members" class="grid"></div></div>
+      </div>
+      <div id="st-mismatch"></div>
+      <p class="muted small-note" id="st-note"></p>
+    </section>
+    <section class="card" id="card-ledger">
+      <div class="card-head">
+        <h2>PayPal ledger <small class="muted">every dollar in and out of the farm's PayPal</small></h2>
+        <div class="row tight">
+          <span id="ledger-kpis" class="row tight"></span>
+          <button id="btn-reconcile" class="btn small primary" title="Re-read every transaction from PayPal and compare status and amount">Reconcile with PayPal</button>
+          <button id="btn-ledger-csv" class="btn small">Export (CSV)</button>
+        </div>
+      </div>
+      <div id="ledger-grid" class="grid"></div>
+      <p class="muted small-note" id="ledger-note"></p>
+    </section>
+    <section class="card" id="card-money">
+      <div class="card-head">
+        <h2>Every request <small class="muted">what the agent understood, which rule decided, and the PayPal call</small></h2>
+        <div class="row tight" id="money-kpis"></div>
+      </div>
+      <div id="money-grid" class="grid"></div>
+    </section>
+  </main>
+
+  <!-- ============================================================ RULES -->
+  <main class="pane hidden" id="pane-rules">
+    <div class="rules-layout">
+      <section class="card teach" id="card-teach">
+        <h2>Teach Boxday a rule</h2>
+        <p class="hint">One sentence, the way you'd tell a new helper. Boxday shows how it understood it and what it would change tonight before anything changes.</p>
+        <textarea id="teach-text" rows="2" placeholder="e.g. You can charge add-ons up to $50 without asking me."></textarea>
+        <div class="examples" id="teach-examples"></div>
+        <div class="row"><button id="btn-teach" class="btn primary">Show me what changes</button><span id="teach-status" class="muted"></span></div>
+        <div id="teach-result"></div>
+      </section>
+      <section class="card" id="card-live">
+        <h2>Rules in force</h2>
+        <div id="rules-live"></div>
+        <div id="rules-taught"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>PayPal: Agent Toolkit (<code>create_refund</code>, <code>create_order</code>, <code>pay_order</code>, <code>create_invoice</code>, <code>send_invoice</code>, <code>get_order</code>) and Vault-saved wallets via Orders v2. AI: a local open-source model via Ollama.</span>
+    <span class="muted">Demo farm, members and messages are fictional. <a href="/classic.html">Classic view</a> has the full rule rewrite.</span>
+  </footer>
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

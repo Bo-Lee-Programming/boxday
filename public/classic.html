@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boxday (classic view)</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/vendor/ag-grid-community.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect x="4" y="12" width="24" height="15" rx="3" fill="#3f6b2a"/><path d="M4 15h24" stroke="#2e5120" stroke-width="2"/><path d="M11 12c0-4 2-7 5-7" stroke="#3f6b2a" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M16 5c2.5 0 4.5 1.4 5 4-2.6.3-4.4-.9-5-4z" fill="#7aa95c"/><circle cx="11" cy="20" r="2.2" fill="#e9b949"/><circle cx="17" cy="20.5" r="2.2" fill="#d9603b"/><circle cx="22.5" cy="19.5" r="2" fill="#f2e3c6"/></svg>
+      <div>
+        <h1>Boxday <span class="farm" id="farm-name"></span></h1>
+        <p id="week-line">The member desk for small farm-share (CSA) farms</p>
+      </div>
+    </div>
+    <div class="badges">
+      <span id="badge-paypal" class="badge">PayPal: …</span>
+      <span id="badge-llm" class="badge">AI: …</span>
+      <button id="btn-wallet" class="btn small hidden">Connect sandbox buyer</button>
+      <button id="btn-reset" class="btn small ghost" title="Restore the demo week">Reset demo</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- 1. Policy -->
+    <section class="card" id="card-policy">
+      <h2><span class="step">1</span> Your farm rules</h2>
+      <p class="hint">Write them the way you'd tell a new helper. Local AI reads them; every number is checked against your words before you confirm.</p>
+      <textarea id="policy-text" rows="7"></textarea>
+      <div class="row">
+        <button id="btn-compile" class="btn primary">Read my rules</button>
+        <span id="compile-status" class="muted"></span>
+      </div>
+      <div id="policy-draft" class="policy hidden">
+        <div class="policy-grid">
+          <label>Skips per season<input id="p-skip" type="number" min="0" step="1"></label>
+          <label>Skip notice (hours)<input id="p-notice" type="number" min="0" step="1"></label>
+          <label>Charge add-ons without asking up to<span class="money"><input id="p-addon" type="number" min="0" step="1"></span></label>
+          <label>Refund missing/spoiled without asking up to<span class="money"><input id="p-refund" type="number" min="0" step="1"></span></label>
+          <label class="check"><input id="p-skiprefund" type="checkbox"> Refund skipped weeks</label>
+          <label class="check"><input id="p-join" type="checkbox"> Allow mid-season joins</label>
+        </div>
+        <p class="fixed-rule">Always: whole-season refunds wait for you · money only moves for the member writing from their own email, to the PayPal account that paid.</p>
+        <ul id="policy-fixes" class="adjustments"></ul>
+        <div class="row"><button id="btn-confirm" class="btn primary">Confirm rules</button></div>
+      </div>
+      <div id="policy-live" class="signed hidden"></div>
+    </section>
+
+    <!-- 2. Inbox -->
+    <section class="card" id="card-inbox">
+      <div class="card-head">
+        <h2><span class="step">2</span> Member inbox</h2>
+        <div class="row tight">
+          <button id="btn-compose" class="btn small ghost">+ Write a test message</button>
+          <button id="btn-process-all" class="btn primary">Handle new messages</button>
+        </div>
+      </div>
+      <form id="compose" class="compose hidden">
+        <input id="c-from" type="email" placeholder="From (e.g. maya.chen@example.com)">
+        <textarea id="c-text" rows="2" placeholder="Message"></textarea>
+        <div class="row tight"><button class="btn small primary" type="submit">Add to inbox</button><span class="muted">Members are listed in the packing sheet below.</span></div>
+      </form>
+      <div class="inbox">
+        <ul id="msg-list" class="msg-list"></ul>
+        <div id="msg-detail" class="msg-detail"><p class="muted">Select a message.</p></div>
+      </div>
+    </section>
+
+    <!-- 3. Packing sheet -->
+    <section class="card wide" id="card-sheet">
+      <div class="card-head">
+        <h2><span class="step">3</span> Packing sheet <small class="muted" id="sheet-week"></small></h2>
+        <div class="row tight">
+          <input id="sheet-filter" type="search" placeholder="Filter members…">
+          <button id="btn-csv" class="btn small">Export packing list (CSV)</button>
+        </div>
+      </div>
+      <div id="site-summary" class="site-summary"></div>
+      <div id="sheet-grid" class="grid tall"></div>
+      <p class="muted small-note">Double-click a cell to edit it yourself. Cells the agent changes flash.</p>
+    </section>
+
+    <!-- 4. Money -->
+    <section class="card wide" id="card-money">
+      <div class="card-head">
+        <h2><span class="step">4</span> Decisions &amp; PayPal <small class="muted">every request the agent handled</small></h2>
+        <div class="row tight" id="money-kpis"></div>
+      </div>
+      <div id="money-grid" class="grid"></div>
+    </section>
+
+    <!-- 5. PayPal ledger -->
+    <section class="card wide" id="card-ledger">
+      <div class="card-head">
+        <h2><span class="step">5</span> PayPal ledger <small class="muted">every dollar in and out of the farm's PayPal</small></h2>
+        <div class="row tight">
+          <span id="ledger-kpis" class="row tight"></span>
+          <button id="btn-reconcile" class="btn small primary" title="Re-read every transaction from PayPal and compare status and amount">Reconcile with PayPal</button>
+          <button id="btn-ledger-csv" class="btn small">Export (CSV)</button>
+        </div>
+      </div>
+      <div id="ledger-grid" class="grid"></div>
+      <p class="muted small-note" id="ledger-note">Season payments were captured at sign-up; refunds go back against them. Pending = pay links and invoices not yet paid.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>PayPal: Agent Toolkit (<code>create_refund</code>, <code>create_order</code>, <code>pay_order</code>, <code>create_invoice</code>, <code>send_invoice</code>) and Vault-saved wallets via Orders v2. AI: a local open-source model via Ollama.</span>
+    <span class="muted">Demo farm, members and messages are fictional.</span>
+  </footer>
+  <div id="toast" class="toast hidden"></div>
+  <script src="/classic.js"></script>
+</body>
+</html>
